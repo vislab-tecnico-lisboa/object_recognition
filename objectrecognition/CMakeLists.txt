@@ -76,10 +76,10 @@ add_library(objectrecognition_sv
 #	)
 
 add_executable(object_detector_sv src/ros_objectrecognition_sv/household_object_detector.cpp)
-target_link_libraries(object_detector_sv  objectrecognition_sv  -lpq ${Boost_LIBRARIES}  ${PCL_LIBRARIES} vtkCommon vtkGraphics vtkIO vtkFiltering ${catkin_LIBRARIES})
+target_link_libraries(object_detector_sv  objectrecognition_sv -fopenmp -lpq ${Boost_LIBRARIES}  ${PCL_LIBRARIES} vtkCommon vtkGraphics vtkIO vtkFiltering ${catkin_LIBRARIES})
 
 add_executable(object_recognition_pose_estimation_server src/ros_objectrecognition_sv/household_object_detector_server.cpp)
-target_link_libraries(object_recognition_pose_estimation_server  objectrecognition_sv  -lpq ${Boost_LIBRARIES}  ${PCL_LIBRARIES} vtkCommon vtkGraphics vtkIO vtkFiltering ${catkin_LIBRARIES})
+target_link_libraries(object_recognition_pose_estimation_server  objectrecognition_sv  -fopenmp -lpq ${Boost_LIBRARIES}  ${PCL_LIBRARIES} vtkCommon vtkGraphics vtkIO vtkFiltering ${catkin_LIBRARIES})
 
 #target_link_libraries(object_detector_sv ${catkin_LIBRARIES} objectrecognition_sv vtkCommon vtkGraphics vtkIO vtkFiltering  -lpq ${Boost_LIBRARIES} ${PCL_LIBRARIES})
 #add_executable(object_graspable_points src/ros_objectrecognition_sv/graspable_points.cpp)
