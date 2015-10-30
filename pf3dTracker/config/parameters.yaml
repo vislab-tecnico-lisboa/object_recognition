@@ -38,35 +38,14 @@ outputDataPort:              /pf3dTracker/data_o
 #projection model and parameters#
 #################################
 
-#iCub01 2008-07-29-afternoon.
-# perspectiveFx               221.731
-# perspectiveFy               221.396
-# perspectiveCx               152.533
-# perspectiveCy               114.882
-
-#iCubLisboaLeftEye_2009_03_04
-#perspectiveFx 		217.934
-#perspectiveFy		218.24
-#perspectiveCx		185.282
-#perspectiveCy		121.498perspectiveFx
-
-#iCubLisboaLeftEye_Zoom_Lens_2009_05_19
-#w: 320
-#h: 240
-#perspectiveFx: 445.202
-#perspectiveFy: 445.664
-#perspectiveCx: 188.297
-#perspectiveCy: 138.496
 
 # my webcam, with 320x240 resolution.
-w: 320
-h: 240
-perspectiveFx:               465
-perspectiveFy:               465
-perspectiveCx:               150
-perspectiveCy:               132
-
-
+w: 640
+h: 480
+perspectiveFx:               338.95
+perspectiveFy:               340.40
+perspectiveCx:               322.12
+perspectiveCy:               227.09
 
 #######################
 #tracked object models#
