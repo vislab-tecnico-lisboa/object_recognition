@@ -209,12 +209,9 @@ public:
                 const double & __initialX,
                 const double & __initialY,
                 const double & __initialZ,
-                const int & __calibrationImageWidth,
-                const int & __calibrationImageHeight,
-                const double & __perspectiveFx,
-                const double & __perspectiveFy,
-                const double & __perspectiveCx,
-                const double & __perspectiveCy); //constructor
+                const int & _width,
+                const int & _height,
+                const cv::Mat & _intrinsic_parameters); //constructor
     ~PF3DTracker(); //destructor
 
     bool open(); //member to set the object up.

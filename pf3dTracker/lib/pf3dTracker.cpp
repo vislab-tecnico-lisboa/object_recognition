@@ -106,12 +106,9 @@ PF3DTracker::PF3DTracker(const int & __nParticles,
                          const double & __initialX,
                          const double & __initialY,
                          const double & __initialZ,
-                         const int & __calibrationImageWidth,
-                         const int & __calibrationImageHeight,
-                         const double & __perspectiveFx,
-                         const double & __perspectiveFy,
-                         const double & __perspectiveCx,
-                         const double & __perspectiveCy):
+                         const int & _width,
+                         const int & _height,
+                         const cv::Mat & _intrinsic_parameters):
     _nParticles(__nParticles),
     accelStdDev(__accelStdDev),
     _insideOutsideDifferenceWeight(__insideOutsideDifferenceWeight),
@@ -124,13 +121,14 @@ PF3DTracker::PF3DTracker(const int & __nParticles,
     _initialX(__initialX),
     _initialY(__initialY),
     _initialZ(__initialZ),
-    _calibrationImageWidth(__calibrationImageWidth),
-    _calibrationImageHeight(__calibrationImageHeight),
-    _perspectiveFx(__perspectiveFx),
-    _perspectiveFy(__perspectiveFy),
-    _perspectiveCx(__perspectiveCx),
-    _perspectiveCy(__perspectiveCy)
+    _calibrationImageWidth(_width),
+    _calibrationImageHeight(_height)
 {
+    _perspectiveFx=_intrinsic_parameters.at<double>(0,0);
+    _perspectiveFy=_intrinsic_parameters.at<double>(1,1);
+    _perspectiveCx=_intrinsic_parameters.at<double>(0,2);
+    _perspectiveCy=_intrinsic_parameters.at<double>(1,2);
+
     _staticImageTest = false;
 
     bool setUpDoneCorrectly = false;

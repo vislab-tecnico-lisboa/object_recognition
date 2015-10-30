@@ -2,6 +2,17 @@
 
 Pf3dTrackerRos::Pf3dTrackerRos(const ros::NodeHandle & n_, const ros::NodeHandle & n_priv_) : n(n_), n_priv(n_priv_), it(n)
 {
+
+    camera_info_sub=n.subscribe("camera_info",1,&Pf3dTrackerRos::cameraInfoCallback, this);
+}
+
+
+
+
+void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camera_info)
+{
+    camera_info_sub.shutdown();
+
     int nParticles;
     double accelStdDev;
     double insideOutsideDifferenceWeight;
@@ -22,12 +33,6 @@ Pf3dTrackerRos::Pf3dTrackerRos(const ros::NodeHandle & n_, const ros::NodeHandle
     double initialY;
     double initialZ;
 
-    int calibrationImageWidth;
-    int calibrationImageHeight;
-    double perspectiveFx;
-    double perspectiveFy;
-    double perspectiveCx;
-    double perspectiveCy;
     //***********************************************
     // Read parameters from the initialization file *
     //***********************************************
@@ -47,16 +52,8 @@ Pf3dTrackerRos::Pf3dTrackerRos(const ros::NodeHandle & n_, const ros::NodeHandle
     n_priv.param<double>("initialX", initialX, 0.0);
     n_priv.param<double>("initialY", initialY, 0.0);
     n_priv.param<double>("initialZ", initialZ, 0.2);
-    n_priv.param<int>("w", calibrationImageWidth,        320); //NOT USED AT THE MOMENT
-    n_priv.param<int>("h", calibrationImageHeight,       240);  //NOT USED AT THE MOMENT
-    n_priv.param<double>("perspectiveFx", perspectiveFx, 980.0);
-    n_priv.param<double>("perspectiveFy", perspectiveFy, 982.0);
-    n_priv.param<double>("perspectiveCx", perspectiveCx, 320.0);
-    n_priv.param<double>("perspectiveCy", perspectiveCy, 240.0);
-    //Units are meters outside the program, but millimeters inside, so we need to convert
-    initialX*=1000.0;
-    initialY*=1000.0;
-    initialZ*=1000.0;
+
+
 
     //Camera intrinsic parameters
 
@@ -87,13 +84,27 @@ Pf3dTrackerRos::Pf3dTrackerRos(const ros::NodeHandle & n_, const ros::NodeHandle
     ROS_INFO_STREAM("initialX: "<<initialX);
     ROS_INFO_STREAM("initialY: "<<initialY);
     ROS_INFO_STREAM("initialZ: "<<initialZ);
-    ROS_INFO_STREAM("calibrationImageWidth: "<<calibrationImageWidth);
-    ROS_INFO_STREAM("calibrationImageHeight: "<<calibrationImageHeight);
-    ROS_INFO_STREAM("perspectiveFx: "<<perspectiveFx);
-    ROS_INFO_STREAM("perspectiveFy: "<<perspectiveFy);
-    ROS_INFO_STREAM("perspectiveCx: "<<perspectiveCx);
-    ROS_INFO_STREAM("perspectiveCy: "<<perspectiveCy);
 
+
+    ROS_INFO("Getting cameras' parameters");
+
+    //set the cameras intrinsic parameters
+    cv::Mat cam_intrinsic = cv::Mat::eye(3,3,CV_64F);
+    cam_intrinsic.at<double>(0,0) = camera_info->K.at(0);
+    cam_intrinsic.at<double>(1,1) = camera_info->K.at(4);
+    cam_intrinsic.at<double>(0,2) = camera_info->K.at(2);
+    cam_intrinsic.at<double>(1,2) = camera_info->K.at(5);
+
+    double width=(unsigned int)camera_info->width;
+    double height=(unsigned int)camera_info->height;
+
+    std::cout << cam_intrinsic << std::endl;
+    std::cout << width << std::endl;
+    std::cout << height << std::endl;
+    //Units are meters outside the program, but millimeters inside, so we need to convert
+    initialX*=1000.0;
+    initialY*=1000.0;
+    initialZ*=1000.0;
     tracker=boost::shared_ptr<PF3DTracker>(new PF3DTracker(nParticles,
                                                            accelStdDev,
                                                            insideOutsideDifferenceWeight,
@@ -106,13 +117,9 @@ Pf3dTrackerRos::Pf3dTrackerRos(const ros::NodeHandle & n_, const ros::NodeHandle
                                                            initialX,
                                                            initialY,
                                                            initialZ,
-                                                           calibrationImageWidth,
-                                                           calibrationImageHeight,
-                                                           perspectiveFx,
-                                                           perspectiveFy,
-                                                           perspectiveCx,
-                                                           perspectiveCy));
-
+                                                           width,
+                                                           height,
+                                                           cam_intrinsic));
 
     // Set the input video port, with the associated callback method
     image_in = it.subscribe("image_in", 1, &Pf3dTrackerRos::processImageCallback, this);
@@ -122,8 +129,12 @@ Pf3dTrackerRos::Pf3dTrackerRos(const ros::NodeHandle & n_, const ros::NodeHandle
 
     // Set the estimates out topic
     estimates_out  = n.advertise<pf3d_tracker::Estimates>("estimates_out", 1);
-
 }
+
+
+
+
+
 void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
 {
     int count;
@@ -173,10 +184,10 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
         //_rawImage = bridge_.imgMsgToCv(msg_ptr,aux); //This is an RGB image
     }
 
-    cv::Mat resized_image;
-    cv::resize(_rawImage, resized_image, cv::Size(320, 240), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
+    //cv::Mat resized_image;
+    //cv::resize(_rawImage, resized_image, cv::Size(320, 240), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
 
-    tracker->processImage(resized_image);
+    tracker->processImage(_rawImage);
 
 
     /////////////////
@@ -196,7 +207,7 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
 
 
 
-    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", resized_image).toImageMsg();
+    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", _rawImage).toImageMsg();
 
     image_out.publish(img_msg);
 

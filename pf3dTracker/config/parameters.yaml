@@ -64,8 +64,8 @@ trackedObjectTemp:           current_histogram.csv
 #######################
 #initialization method [search|3dEstimate|2dEstimate]
 initializationMethod:        3dEstimate
-initialX:                       0.30
-initialY:                       0.20
+initialX:                       0.3
+initialY:                       0.2
 initialZ:                       0.6
 
 

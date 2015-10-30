@@ -24,7 +24,7 @@ class Pf3dTrackerRos
     image_transport::Publisher image_out;
     ros::Publisher estimates_out;
 
-
+    ros::Subscriber camera_info_sub;
     std_msgs::Time _rosTimestamp;
 
     cv_bridge::CvImageConstPtr _rosImage;
@@ -43,6 +43,11 @@ class Pf3dTrackerRos
 public:
     Pf3dTrackerRos(const ros::NodeHandle & n_, const ros::NodeHandle & n_priv_);
     void processImageCallback(const sensor_msgs::ImageConstPtr& msg_ptr);
+
+
+    // initialization callback
+    void cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camera_info);
+
 };
 
 #endif // PF3DTRACKERROS_H
