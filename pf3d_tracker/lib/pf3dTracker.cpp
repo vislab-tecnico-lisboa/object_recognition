@@ -287,7 +287,7 @@ bool PF3DTracker::open()
     _particles1to6=_particles(cv::Range(0,6), cv::Range::all());
     //allocate memory for the "new" particles;
     _newParticles=cv::Mat(7,_nParticles,CV_64FC1);
-    _newParticles1to6=_newParticles(cv::Range::all(), cv::Range::all());
+    _newParticles1to6=_newParticles(cv::Range(0,6), cv::Range::all());
     //allocate memory for "noise"
     _noise=cv::Mat(6,_nParticles,CV_64FC1);
     _noise.setTo(cv::Scalar(0));
