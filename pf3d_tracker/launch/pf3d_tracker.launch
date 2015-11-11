@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-  	<arg name="image_in" default="/vizzy/l_camera/image_rect_color"/>
-  	<arg name="camera_info" default="/vizzy/l_camera/camera_info"/>
+  	<arg name="image_in" default="/usb_cam/image_raw"/>
+  	<arg name="camera_info" default="/usb_cam/camera_info"/>
   	<arg name="image_out" default="/vizzy/l_camera/ball_tracker"/>
 
 	<node pkg="pf3d_tracker" name="pf3d_tracker" type="pf3d_tracker_node"  output="screen">

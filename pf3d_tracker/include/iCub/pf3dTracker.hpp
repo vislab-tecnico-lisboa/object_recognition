@@ -209,14 +209,14 @@ public:
                 const double & __initialX,
                 const double & __initialY,
                 const double & __initialZ,
-                const int & _width,
-                const int & _height,
+                const int & calibrationImageWidth,
+                const int & calibrationImageWidth,
                 const cv::Mat & _intrinsic_parameters); //constructor
     ~PF3DTracker(); //destructor
 
     bool open(); //member to set the object up.
     virtual bool close();                  //member to close the object.
-    void processImage(const cv::Mat & image);
+    void processImage(cv::Mat & image);
 
     //virtual bool updateModule();           //member that is repeatedly called by YARP, to give this object a chance to do something.
 

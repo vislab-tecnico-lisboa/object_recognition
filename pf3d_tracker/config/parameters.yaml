@@ -39,14 +39,6 @@ outputDataPort:              /pf3dTracker/data_o
 #################################
 
 
-# my webcam, with 320x240 resolution.
-w: 640
-h: 480
-perspectiveFx:               338.95
-perspectiveFy:               340.40
-perspectiveCx:               322.12
-perspectiveCy:               227.09
-
 #######################
 #tracked object models#
 #######################

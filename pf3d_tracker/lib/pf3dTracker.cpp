@@ -106,8 +106,8 @@ PF3DTracker::PF3DTracker(const int & __nParticles,
                          const double & __initialX,
                          const double & __initialY,
                          const double & __initialZ,
-                         const int & _width,
-                         const int & _height,
+                         const int & calibrationImageWidth,
+                         const int & calibrationImageWidth,
                          const cv::Mat & _intrinsic_parameters):
     _nParticles(__nParticles),
     accelStdDev(__accelStdDev),
@@ -121,8 +121,8 @@ PF3DTracker::PF3DTracker(const int & __nParticles,
     _initialX(__initialX),
     _initialY(__initialY),
     _initialZ(__initialZ),
-    _calibrationImageWidth(_width),
-    _calibrationImageHeight(_height)
+    _calibrationImageWidth(calibrationImageWidth),
+    _calibrationImageHeight(calibrationImageWidth)
 {
     _perspectiveFx=_intrinsic_parameters.at<double>(0,0);
     _perspectiveFy=_intrinsic_parameters.at<double>(1,1);
@@ -287,7 +287,7 @@ bool PF3DTracker::open()
     _particles1to6=_particles(cv::Range(0,6), cv::Range::all());
     //allocate memory for the "new" particles;
     _newParticles=cv::Mat(7,_nParticles,CV_64FC1);
-    _newParticles1to6=_newParticles(cv::Range::all(), cv::Range::all());
+    _newParticles1to6=_newParticles(cv::Range(0,6), cv::Range::all());
     //allocate memory for "noise"
     _noise=cv::Mat(6,_nParticles,CV_64FC1);
     _noise.setTo(cv::Scalar(0));
@@ -411,7 +411,7 @@ bool PF3DTracker::open()
 //**************************
 //* PROCESS IMAGE CALLBACK *
 //**************************
-void PF3DTracker::processImage(const cv::Mat & image)
+void PF3DTracker::processImage(cv::Mat & image)
 {
     int count;
     unsigned int seed;
@@ -550,12 +550,18 @@ void PF3DTracker::processImage(const cv::Mat & image)
             weightedMeanX+=(double)_particles.at<double>(0,count);
             weightedMeanY+=(double)_particles.at<double>(1,count);
             weightedMeanZ+=(double)_particles.at<double>(2,count);
+
+            if(isnan(_particles.at<double>(0,count))|| isnan(_particles.at<double>(6,count)))
+            {
+                std::cout << "fds2:"<<_particles.at<double>(0,count) << std::endl;
+
+            }
         }
+
         weightedMeanX/=_nParticles;
         weightedMeanY/=_nParticles;
         weightedMeanZ/=_nParticles;
         //this mean is not weighted as there is no weight to use: the particles have just been generated.
-
 
         //*****************************************
         //WRITE ESTIMATES TO THE SCREEN, FIRST PART
@@ -582,9 +588,12 @@ void PF3DTracker::processImage(const cv::Mat & image)
             weightedMeanX+=(double)_particles.at<double>(0,count)*_particles.at<double>(6,count);
             weightedMeanY+=(double)_particles.at<double>(1,count)*_particles.at<double>(6,count);
             weightedMeanZ+=(double)_particles.at<double>(2,count)*_particles.at<double>(6,count);
+
+            if(isnan(_particles.at<double>(0,count))|| isnan(_particles.at<double>(6,count)))
+            {
+                std::cout << "fds:"<<_particles.at<double>(0,count) << std::endl;
+            }
         }
-
-
 
         //*****************************
         //WRITE ESTIMATES TO THE SCREEN
@@ -1072,16 +1081,11 @@ bool PF3DTracker::evaluateHypothesisPerspectiveFromRgbImage(cv::Mat & model3dPoi
     {
         cout<<"I had troubles projecting the points.\n";
     }
-    
-
 
     
     //IT SEEMS TO BE THIS GUY COMPUTING THE WRONG VALUES
     computeHistogramFromRgbImage(_uv, image,  _innerHistogramMat, usedInnerPoints, _outerHistogramMat, usedOuterPoints);
-    
-    
-    
-    
+
     //if((usedInnerPoints<nPixels)||(usedOuterPoints<nPixels))
     //    likelihood=0;
     //else

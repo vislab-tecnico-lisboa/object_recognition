@@ -56,19 +56,6 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
 
 
     //Camera intrinsic parameters
-
-
-    bool _staticImageTest = false;
-
-    if(_staticImageTest)
-    {
-        nParticles=1;
-        accelStdDev=0.0001;
-        initialX =  -45.0; //careful: these are millimeters!
-        initialY =  -45.0; //careful: these are millimeters!
-        initialZ =  290.0; //careful: these are millimeters!
-    }
-
     trackedObjectColorTemplateFile=models_folder+trackedObjectColorTemplate;
     trackedObjectShapeTemplateFile=models_folder+trackedObjectShapeTemplate;
     motionModelMatrixFile=models_folder+motionModelMatrix;
@@ -95,9 +82,14 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
     cam_intrinsic.at<double>(0,2) = camera_info->K.at(2);
     cam_intrinsic.at<double>(1,2) = camera_info->K.at(5);
 
+    cam_intrinsic.at<double>(0,0)=160.0;
+    cam_intrinsic.at<double>(1,1)=120.0;
+    cam_intrinsic.at<double>(0,2)=160.0;
+    cam_intrinsic.at<double>(1,2)=120.0;
     double width=(unsigned int)camera_info->width;
     double height=(unsigned int)camera_info->height;
-
+width=320;
+height=240;
     std::cout << cam_intrinsic << std::endl;
     std::cout << width << std::endl;
     std::cout << height << std::endl;
@@ -144,7 +136,6 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
     double meanU;
     double meanV;
     double wholeCycle;
-    string outputFileName;
     stringstream out;
     cv::Mat rawImageBGR;
     cv::Mat _rawImage;
@@ -174,6 +165,7 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
             std::string aux = "bgr8";
 
             _rawImage=cv_bridge::toCvShare(msg_ptr, aux)->image;
+            _rawImage=cv_bridge::toCvCopy(msg_ptr, aux)->image;
         }
         catch (cv_bridge::Exception& e)
         {
@@ -184,10 +176,10 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
         //_rawImage = bridge_.imgMsgToCv(msg_ptr,aux); //This is an RGB image
     }
 
-    //cv::Mat resized_image;
-    //cv::resize(_rawImage, resized_image, cv::Size(320, 240), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
+    cv::Mat resized_image;
+    cv::resize(_rawImage, resized_image, cv::Size(320, 240), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
 
-    tracker->processImage(_rawImage);
+    tracker->processImage(resized_image);
 
 
     /////////////////
@@ -207,7 +199,7 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
 
 
 
-    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", _rawImage).toImageMsg();
+    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", resized_image).toImageMsg();
 
     image_out.publish(img_msg);
 
