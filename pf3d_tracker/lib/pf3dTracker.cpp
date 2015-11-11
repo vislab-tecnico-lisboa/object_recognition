@@ -107,7 +107,7 @@ PF3DTracker::PF3DTracker(const int & __nParticles,
                          const double & __initialY,
                          const double & __initialZ,
                          const int & calibrationImageWidth,
-                         const int & calibrationImageWidth,
+                         const int & calibrationImageHeight,
                          const cv::Mat & _intrinsic_parameters):
     _nParticles(__nParticles),
     accelStdDev(__accelStdDev),
@@ -122,7 +122,7 @@ PF3DTracker::PF3DTracker(const int & __nParticles,
     _initialY(__initialY),
     _initialZ(__initialZ),
     _calibrationImageWidth(calibrationImageWidth),
-    _calibrationImageHeight(calibrationImageWidth)
+    _calibrationImageHeight(calibrationImageHeight)
 {
     _perspectiveFx=_intrinsic_parameters.at<double>(0,0);
     _perspectiveFy=_intrinsic_parameters.at<double>(1,1);

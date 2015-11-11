@@ -210,7 +210,7 @@ public:
                 const double & __initialY,
                 const double & __initialZ,
                 const int & calibrationImageWidth,
-                const int & calibrationImageWidth,
+                const int & calibrationImageHeight,
                 const cv::Mat & _intrinsic_parameters); //constructor
     ~PF3DTracker(); //destructor
 
