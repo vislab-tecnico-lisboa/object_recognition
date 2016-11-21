@@ -1,6 +1,7 @@
+<?xml version="1.0"?>
 <launch>
 	<!-- Tabletop segmentation -->
-  <include file="$(find firstmm_tabletop_segmentation)/launch/tabletop_segmentation_online_param_up.launch"/>
+  <include file="$(find tabletop_segmentation_online)/launch/tabletop_segmentation_online_param_up.launch"/>
 
 	<!-- Object details -->
   <include file="$(find ist_object_details)/launch/ist_object_details.launch"/>
