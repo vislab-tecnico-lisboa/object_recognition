@@ -9,11 +9,12 @@ import perception_msgs.msg
 import perception_msgs.srv
 import ist_msgs.msg
 import std_srvs.srv
-import problog_msgs.srv
-from tabletop_object_detector.srv import *
+#import problog_msgs.srv
+from tabletop_object_segmentation_online.srv import *
+from perception_msgs.srv import *
 import visualization_msgs.msg
 import copy
-use_marion=True
+use_marion=False
 topic = 'object_categories'
 publisher = rospy.Publisher(topic, visualization_msgs.msg.MarkerArray)
 markerArray = visualization_msgs.msg.MarkerArray()
@@ -288,18 +289,18 @@ class DetectObjectsAction(object):
         rospy.set_param('/marion_activated', False)
     
     # Service call
-    object_category_response=self.compute_object_category_prior(object_list)
-    if object_category_response==False:
-        #self._as.set_aborted(self._result)
-        return False
-    if use_marion:
-        print "Objects' categories info:"
-        object_list=object_category_response
+    #object_category_response=self.compute_object_category_prior(object_list)
+    #if object_category_response==False:
+    #    #self._as.set_aborted(self._result)
+    #    return False
+    #if use_marion:
+    #    print "Objects' categories info:"
+    #    object_list=object_category_response
     # check that preempt has not been requested by the client
-    if self._as.is_preempt_requested():
-        rospy.loginfo('%s: Preempted' % self._action_name)
-        self._as.set_preempted()
-        return False
+    #if self._as.is_preempt_requested():
+    #    rospy.loginfo('%s: Preempted' % self._action_name)
+    #    self._as.set_preempted()
+    #    return False
     
     # sort according to category
 #     delete_markers()
@@ -312,6 +313,7 @@ class DetectObjectsAction(object):
         object_category=str(object_list.objects[object_index].data.category_hypotheses[0].name)
         #print object_category
 
+	#RVIZ 
         text_pose=copy.deepcopy(object_list.objects[object_index].state.graspable_object.potential_models[0].pose.pose)
         text_pose.position.z=text_pose.position.z+object_list.objects[object_index].data.type.size.values.z+0.02
 

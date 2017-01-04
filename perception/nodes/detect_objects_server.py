@@ -146,16 +146,17 @@ class DetectObjectsAction(object):
   def tabletop_segmentation(self, table):
     print 'waiting for tabletop segmentation service...'
     rospy.wait_for_service('tabletop_segmentation')
-
+    
     try:
       table_top = rospy.ServiceProxy('tabletop_segmentation' , TabletopSegmentation)
-
       myReq = TabletopSegmentationRequest()
+
       if self._first==False:
         myReq.table=table
 
-      resp = table_top(myReq)   
-
+      resp = table_top(myReq) 
+      print 'ola'  
+      print resp		
       if len(resp.clusters) == 0:
         print 'No clusters found'
         return False
@@ -169,6 +170,7 @@ class DetectObjectsAction(object):
 
   def object_recognition_and_pose_estimation(self,segmentation_resp):
     print 'waiting for object recognition and pose estimation service...'
+    #print segmentation_resp.clusters.size()
     rospy.wait_for_service('object_recognition_pose_estimation')
     try:
       obj_rec_pose_est = rospy.ServiceProxy('object_recognition_pose_estimation' , PoseEstimation)
