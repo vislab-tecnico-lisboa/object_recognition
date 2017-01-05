@@ -304,22 +304,23 @@ class DetectObjectsAction(object):
     
     # sort according to category
 #     delete_markers()
-    markerArray.markers=[]
-    for object_index in range(0,len(object_list.objects)):
-        object_list.objects[object_index].data.category_hypotheses=self.getSortedCategoryList(object_list.objects[object_index].data.category_hypotheses)
-        object_frame_id=str(object_list.objects[object_index].collision_name)
+    #markerArray.markers=[]
+    #for object_index in range(0,len(object_list.objects)):
+    #    object_list.objects[object_index].data.category_hypotheses=self.getSortedCategoryList(object_list.objects[object_index].data.category_hypotheses)
+    #    object_frame_id=str(object_list.objects[object_index].collision_name)
         #print object_frame_id
 
-        object_category=str(object_list.objects[object_index].data.category_hypotheses[0].name)
+    #    object_category=str(object_list.objects[object_index].data.category_hypotheses[0].name)
         #print object_category
 
 	#RVIZ 
-        text_pose=copy.deepcopy(object_list.objects[object_index].state.graspable_object.potential_models[0].pose.pose)
-        text_pose.position.z=text_pose.position.z+object_list.objects[object_index].data.type.size.values.z+0.02
+    #    text_pose=copy.deepcopy(object_list.objects[object_index].state.graspable_object.potential_models[0].pose.pose)
+    #    text_pose.position.z=text_pose.position.z+object_list.objects[object_index].data.type.size.values.z+0.02
 
-        add_marker(object_category,object_frame_id,text_pose)
-    print_objects_info(object_category_response)  
+    #    add_marker(object_category,object_frame_id,text_pose)
+    #print_objects_info(object_category_response)  
 
+    
     
 
     return object_list
