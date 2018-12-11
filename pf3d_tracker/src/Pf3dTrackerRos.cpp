@@ -82,14 +82,15 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
     cam_intrinsic.at<double>(0,2) = camera_info->K.at(2);
     cam_intrinsic.at<double>(1,2) = camera_info->K.at(5);
 
-    cam_intrinsic.at<double>(0,0)=160.0;
-    cam_intrinsic.at<double>(1,1)=120.0;
-    cam_intrinsic.at<double>(0,2)=160.0;
-    cam_intrinsic.at<double>(1,2)=120.0;
+    //cam_intrinsic.at<double>(0,0)=160.0;
+    //cam_intrinsic.at<double>(1,1)=120.0;
+    //cam_intrinsic.at<double>(0,2)=160.0;
+    //cam_intrinsic.at<double>(1,2)=120.0;
     double width=(unsigned int)camera_info->width;
     double height=(unsigned int)camera_info->height;
-width=320;
-height=240;
+    //image_ratio=4;
+    //width/=image_ratio;
+    //height/=image_ratio;
     std::cout << cam_intrinsic << std::endl;
     std::cout << width << std::endl;
     std::cout << height << std::endl;
@@ -176,10 +177,10 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
         //_rawImage = bridge_.imgMsgToCv(msg_ptr,aux); //This is an RGB image
     }
 
-    cv::Mat resized_image;
-    cv::resize(_rawImage, resized_image, cv::Size(320, 240), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
+    //cv::Mat resized_image;
+    //cv::resize(_rawImage, resized_image, cv::Size(3088/4, 2076/4), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
 
-    tracker->processImage(resized_image);
+    tracker->processImage(_rawImage);
 
 
     /////////////////
@@ -199,7 +200,7 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
 
 
 
-    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", resized_image).toImageMsg();
+    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", _rawImage).toImageMsg();
 
     image_out.publish(img_msg);
 

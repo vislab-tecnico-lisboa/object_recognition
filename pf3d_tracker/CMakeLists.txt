@@ -30,17 +30,10 @@ generate_messages(
   geometry_msgs
 )
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES foveated_stereo_ros
-#  CATKIN_DEPENDS cv_bridge geometry_msgs message_filters roscpp sensor_msgs std_msgs tf
-#  DEPENDS system_lib
-   CATKIN_DEPENDS message_runtime
-)
-
 
 #common commands for building c++ executables and libraries
 include_directories(include
+  ${catkin_INCLUDE_DIRS}
   ${GSL_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   #${CUDA_INCLUDE_DIRS}
@@ -52,6 +45,13 @@ include_directories(lib/)
 ## foveated stereo lib
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/)
 
+catkin_package(
+  INCLUDE_DIRS include
+#  LIBRARIES foveated_stereo_ros
+#  CATKIN_DEPENDS cv_bridge geometry_msgs message_filters roscpp sensor_msgs std_msgs tf
+#  DEPENDS system_lib
+   CATKIN_DEPENDS message_runtime
+)
 
 add_executable(pf3d_tracker_node src/Pf3dTrackerRos.cpp)
 

@@ -124,11 +124,13 @@ PF3DTracker::PF3DTracker(const int & __nParticles,
     _calibrationImageWidth(calibrationImageWidth),
     _calibrationImageHeight(calibrationImageHeight)
 {
+    //widthRatio=(double)_yarpImage->width()/(double)_calibrationImageWidth;
+    //heightRatio=(double)_yarpImage->height()/(double)_calibrationImageHeight;
     _perspectiveFx=_intrinsic_parameters.at<double>(0,0);
     _perspectiveFy=_intrinsic_parameters.at<double>(1,1);
     _perspectiveCx=_intrinsic_parameters.at<double>(0,2);
     _perspectiveCy=_intrinsic_parameters.at<double>(1,2);
-
+    _numParticlesReceived=0;
     _staticImageTest = false;
 
     bool setUpDoneCorrectly = false;
@@ -263,7 +265,7 @@ bool PF3DTracker::open()
 
 
     //Read the motion model matrix for the tracked object
-    _A=cvCreateMat(7,7,CV_64FC1);    //allocate space for the _A matrix. 64bit double, 1 channel
+    _A=cv::Mat(7,7,CV_64FC1);    //allocate space for the _A matrix. 64bit double, 1 channel
     failure=readMotionModelMatrix(_A, motionModelMatrix);
     if(failure)
     {
@@ -274,7 +276,7 @@ bool PF3DTracker::open()
     //allocate memory for the particles;
     _particles=cv::Mat(7,_nParticles,CV_64FC1);
     //fill the memory with zeros, so that valgrind won't complain.
-    _particles.setTo(cv::Scalar(0));
+    _particles.setTo(cv::Scalar(0.0));
 
     //define ways of accessing the particles:
     _particles1=_particles(cv::Range(0,1), cv::Range::all());
@@ -364,9 +366,9 @@ bool PF3DTracker::open()
     _drawingMat=cv::Mat(3, 2*nPixels, CV_64FC1);
     _projectionMat=cv::Mat(2, 3, CV_64FC1);
 
-    _xyzMat1 = cvCreateMatHeader(1,2*nPixels,CV_64FC1);
-    _xyzMat2 = cvCreateMatHeader(1,2*nPixels,CV_64FC1);
-    _xyzMat3 = cvCreateMatHeader(1,2*nPixels,CV_64FC1);
+    _xyzMat1 = cv::Mat(1,2*nPixels,CV_64FC1);
+    _xyzMat2 = cv::Mat(1,2*nPixels,CV_64FC1);
+    _xyzMat3 = cv::Mat(1,2*nPixels,CV_64FC1);
 
 
 
@@ -481,7 +483,6 @@ void PF3DTracker::processImage(cv::Mat & image)
             maxIndex=count;
         }
     }
-    
     if(maxIndex!=-1)
     {
         maxX=(double)_particles.at<double>(0,maxIndex);
@@ -494,7 +495,6 @@ void PF3DTracker::processImage(cv::Mat & image)
         maxY=1;
         maxZ=1000;
     }
-    
     if(_staticImageTest)
     {
         cout<<"maxLikelihood = "<<maxLikelihood<<endl;
@@ -512,7 +512,6 @@ void PF3DTracker::processImage(cv::Mat & image)
         _seeingObject=0;
         _framesNotTracking+=1;
     }
-    
     
     //If the likelihood has been under the threshold for 5 frames, reinitialize the tracker.
     //This just works for the sphere.
@@ -594,7 +593,6 @@ void PF3DTracker::processImage(cv::Mat & image)
                 std::cout << "fds:"<<_particles.at<double>(0,count) << std::endl;
             }
         }
-
         //*****************************
         //WRITE ESTIMATES TO THE SCREEN
         //*****************************
@@ -604,7 +602,6 @@ void PF3DTracker::processImage(cv::Mat & image)
         cout<<"  "<<setiosflags(ios::fixed)<<setprecision(3)<<setw(8)<<weightedMeanZ/1000; //millimeters to meters
         cout<<"  "<<setiosflags(ios::fixed)<<setprecision(5)<<setw(8)<<maxLikelihood/exp((double)20.0); //normalizing likelihood
         cout<<"  "<<setw(5)<<_seeingObject;
-
 
         //------------------------------------------------------------martim
         /*Bottle *particleInput=_inputParticlePort.read(false);
@@ -629,7 +626,6 @@ void PF3DTracker::processImage(cv::Mat & image)
 
             //TODO non funziona ancora, credo: nelle particelle resamplate ci sono dei not-a-number.
             systematic_resampling(_particles1to6,_particles7,_newParticles,_cumWeight);
-
         }
         else //I can't apply a resampling with all weights equal to 0!
         {
@@ -641,7 +637,6 @@ void PF3DTracker::processImage(cv::Mat & image)
             _particles.copyTo(_newParticles);
             //cvCopy(_particles,_newParticles);
         }
-
         //cout<<"after resampling\n";
         /*            cout<<"Accessing the first column of _NewParticles after the resampling: "<<((double*)(_newParticles.data +  + _newParticles.step*0))[0]<<" ";
             cout<<((double*)(_newParticles.data + _newParticles.step*1))[0]<<" ";
@@ -668,8 +663,6 @@ void PF3DTracker::processImage(cv::Mat & image)
         //APPLY THE MOTION MODEL: 1.APPLY THE MATRIX
         //******************************************
         _particles=_A*_newParticles;
-        //cv::multiply(_A,_newParticles,_particles);
-
         //the "good" particles now are in _particles
         //********************************************************
         //APPLY THE MOTION MODEL: 2.ADD THE EFFECT OF ACCELERATION
@@ -712,7 +705,6 @@ void PF3DTracker::processImage(cv::Mat & image)
         //------------------------------------------------------------end martim
     }
     
-
     //************************************
     //DRAW THE SAMPLED POINTS ON THE IMAGE
     //************************************
