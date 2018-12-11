@@ -6,7 +6,7 @@
 #include <sensor_msgs/image_encodings.h>
 //#include <cv_bridge/CvBridge.h>
 #include <cv_bridge/cv_bridge.h>
-
+#include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/Time.h>
 #include <pf3d_tracker/Estimates.h>
 #include <iCub/pf3dTracker.hpp>

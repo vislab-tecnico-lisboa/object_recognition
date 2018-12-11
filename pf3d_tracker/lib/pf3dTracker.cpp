@@ -126,10 +126,10 @@ PF3DTracker::PF3DTracker(const int & __nParticles,
 {
     //widthRatio=(double)_yarpImage->width()/(double)_calibrationImageWidth;
     //heightRatio=(double)_yarpImage->height()/(double)_calibrationImageHeight;
-    _perspectiveFx=_intrinsic_parameters.at<double>(0,0)/2;
-    _perspectiveFy=_intrinsic_parameters.at<double>(1,1)/2;
-    _perspectiveCx=_intrinsic_parameters.at<double>(0,2)/2;
-    _perspectiveCy=_intrinsic_parameters.at<double>(1,2)/2;
+    _perspectiveFx=_intrinsic_parameters.at<double>(0,0);
+    _perspectiveFy=_intrinsic_parameters.at<double>(1,1);
+    _perspectiveCx=_intrinsic_parameters.at<double>(0,2);
+    _perspectiveCy=_intrinsic_parameters.at<double>(1,2);
     _numParticlesReceived=0;
     _staticImageTest = false;
 

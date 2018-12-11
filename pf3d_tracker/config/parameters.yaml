@@ -46,7 +46,7 @@ outputDataPort:              /pf3dTracker/data_o
 trackedObjectType:           sphere
 #trackedObjectColorTemplate  blue_general_model_2009_03_03.bmp
 trackedObjectColorTemplate:  red_ball_paris_handle.jpg
-trackedObjectShapeTemplate:  initial_ball_points_smiley_31mm_20percent.csv
+trackedObjectShapeTemplate:  initial_ball_points_smiley_57mm_20percent.csv
 
 motionModelMatrix:           motion_model_matrix.csv
 trackedObjectTemp:           current_histogram.csv

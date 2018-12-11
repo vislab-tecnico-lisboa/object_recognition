@@ -53,7 +53,7 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
     n_priv.param<double>("initialY", initialY, 0.0);
     n_priv.param<double>("initialZ", initialZ, 0.2);
 
-    n_priv.param<bool>("crop_center", crop_center, true);
+    n_priv.param<bool>("crop_center", crop_center, false);
 
 
 
@@ -124,7 +124,7 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
 
     // Set the estimates out topic
     //estimates_out  = n.advertise<pf3d_tracker::Estimates>("estimates_out", 1);
-    estimates_out  = n.advertise<geometry_msgs::PointStamped>("estimates_out", 1);
+    estimates_out  = n.advertise<geometry_msgs::PoseStamped>("estimates_out", 1);
 }
 
 
@@ -185,7 +185,7 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
 
 
     cv::Mat resized_image;
-    cv::resize(_rawImage, resized_image, cv::Size(3088/2, 2076/2), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
+    //cv::resize(_rawImage, resized_image, cv::Size(3088/2, 2076/2), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
 
     
     if(crop_center)
@@ -201,7 +201,7 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
         resized_image = processed_img;
     }
 
-    tracker->processImage(resized_image);
+    tracker->processImage(_rawImage);
 
 
     /////////////////
@@ -218,15 +218,19 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
     outMsg.meanV=meanV;
     //outMsg.seeingBall=_seeingObject;
     estimates_out.publish(outMsg);*/
-    geometry_msgs::PointStamped outMsg;
-    outMsg.point.x = tracker->weightedMeanX/1000;
-    outMsg.point.y = tracker->weightedMeanY/1000;
-    outMsg.point.z = tracker->weightedMeanZ/1000;
+    geometry_msgs::PoseStamped outMsg;
+    outMsg.pose.position.x = tracker->weightedMeanX/1000;
+    outMsg.pose.position.y = tracker->weightedMeanY/1000;
+    outMsg.pose.position.z = tracker->weightedMeanZ/1000;
+    outMsg.pose.orientation.x = 0.0;
+    outMsg.pose.orientation.y = 0.0;
+    outMsg.pose.orientation.z = 0.0;
+    outMsg.pose.orientation.w = 1.0;
     outMsg.header.frame_id="l_camera_vision_link";
     estimates_out.publish(outMsg);
 
 
-    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", resized_image).toImageMsg();
+    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", _rawImage).toImageMsg();
 
     image_out.publish(img_msg);
 
