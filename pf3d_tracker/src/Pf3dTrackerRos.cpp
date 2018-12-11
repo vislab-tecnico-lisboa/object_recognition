@@ -53,6 +53,8 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
     n_priv.param<double>("initialY", initialY, 0.0);
     n_priv.param<double>("initialZ", initialZ, 0.2);
 
+    n_priv.param<bool>("crop_center", crop_center, true);
+
 
 
     //Camera intrinsic parameters
@@ -121,7 +123,8 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
     image_out = it.advertise("image_out", 1);
 
     // Set the estimates out topic
-    estimates_out  = n.advertise<pf3d_tracker::Estimates>("estimates_out", 1);
+    //estimates_out  = n.advertise<pf3d_tracker::Estimates>("estimates_out", 1);
+    estimates_out  = n.advertise<geometry_msgs::PointStamped>("estimates_out", 1);
 }
 
 
@@ -167,6 +170,7 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
 
             _rawImage=cv_bridge::toCvShare(msg_ptr, aux)->image;
             _rawImage=cv_bridge::toCvCopy(msg_ptr, aux)->image;
+            
         }
         catch (cv_bridge::Exception& e)
         {
@@ -177,10 +181,27 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
         //_rawImage = bridge_.imgMsgToCv(msg_ptr,aux); //This is an RGB image
     }
 
-    //cv::Mat resized_image;
-    //cv::resize(_rawImage, resized_image, cv::Size(3088/4, 2076/4), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
 
-    tracker->processImage(_rawImage);
+
+
+    cv::Mat resized_image;
+    cv::resize(_rawImage, resized_image, cv::Size(3088/2, 2076/2), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
+
+    
+    if(crop_center)
+    {
+
+        cv::Mat processed_img = cv::Mat::zeros(resized_image.size(),  resized_image.type());
+        std::cout << resized_image.size() << std::endl;
+        cv::Mat mask = cv::Mat::zeros(resized_image.size(), resized_image.type());
+
+        //cv::circle(mask, cv::Point(mask.cols/2, mask.rows/2), 300/2, cv::Scalar(255, 255, 255), -1, 8, 0);
+        cv::rectangle(mask,cv::Point(mask.cols/2-300/2, mask.rows/2-300/2),cv::Point(mask.cols/2+300/2, mask.rows/2+300/2),cv::Scalar(255, 255, 255),-1,8,0);
+        resized_image.copyTo(processed_img, mask);
+        resized_image = processed_img;
+    }
+
+    tracker->processImage(resized_image);
 
 
     /////////////////
@@ -189,18 +210,23 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
 
     /*pf3d_tracker::Estimates outMsg;
     outMsg.mean.point.x=tracker->weightedMeanX/1000;
-    outMsg.mean.point.y=weightedMeanY/1000;
-    outMsg.mean.point.z=weightedMeanZ/1000;
+    outMsg.mean.point.y=tracker->weightedMeanY/1000;
+    outMsg.mean.point.z=tracker->weightedMeanZ/1000;
 
     outMsg.likelihood=tracker->maxLikelihood/exp((double)20.0);
     outMsg.meanU=meanU;
     outMsg.meanV=meanV;
-    outMsg.seeingBall=_seeingObject;
-    _outputDataPort.publish(outMsg);*/
+    //outMsg.seeingBall=_seeingObject;
+    estimates_out.publish(outMsg);*/
+    geometry_msgs::PointStamped outMsg;
+    outMsg.point.x = tracker->weightedMeanX/1000;
+    outMsg.point.y = tracker->weightedMeanY/1000;
+    outMsg.point.z = tracker->weightedMeanZ/1000;
+    outMsg.header.frame_id="l_camera_vision_link";
+    estimates_out.publish(outMsg);
 
 
-
-    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", _rawImage).toImageMsg();
+    sensor_msgs::ImagePtr img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", resized_image).toImageMsg();
 
     image_out.publish(img_msg);
 

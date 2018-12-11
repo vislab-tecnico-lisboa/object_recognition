@@ -217,7 +217,8 @@ public:
     bool open(); //member to set the object up.
     virtual bool close();                  //member to close the object.
     void processImage(cv::Mat & image);
-
+    double weightedMeanX, weightedMeanY, weightedMeanZ;
+    float maxLikelihood;
     //virtual bool updateModule();           //member that is repeatedly called by YARP, to give this object a chance to do something.
 
 };

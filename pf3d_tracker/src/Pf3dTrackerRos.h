@@ -29,6 +29,8 @@ class Pf3dTrackerRos
 
     cv_bridge::CvImageConstPtr _rosImage;
 
+    bool crop_center;
+
 
     //std::string _inputParticlePortName;
     //BufferedPort<Bottle> _inputParticlePort;

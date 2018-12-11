@@ -195,7 +195,6 @@ private:
     bool _firstFrame; //when processing the first frame do not write the fps values, as it's wrong.
     bool _staticImageTest; //when true, only one image is read from a file
 
-
     ///////////////////////
     //MEMBERS THAT "WORK":/
     ///////////////////////
@@ -233,6 +232,8 @@ public:
 
     bool open(); //member to set the object up.
     virtual bool close();                  //member to close the object.
+    double weightedMeanX, weightedMeanY, weightedMeanZ;
+    float maxLikelihood;
 
     //virtual bool updateModule();           //member that is repeatedly called by YARP, to give this object a chance to do something.
 

@@ -126,10 +126,10 @@ PF3DTracker::PF3DTracker(const int & __nParticles,
 {
     //widthRatio=(double)_yarpImage->width()/(double)_calibrationImageWidth;
     //heightRatio=(double)_yarpImage->height()/(double)_calibrationImageHeight;
-    _perspectiveFx=_intrinsic_parameters.at<double>(0,0);
-    _perspectiveFy=_intrinsic_parameters.at<double>(1,1);
-    _perspectiveCx=_intrinsic_parameters.at<double>(0,2);
-    _perspectiveCy=_intrinsic_parameters.at<double>(1,2);
+    _perspectiveFx=_intrinsic_parameters.at<double>(0,0)/2;
+    _perspectiveFy=_intrinsic_parameters.at<double>(1,1)/2;
+    _perspectiveCx=_intrinsic_parameters.at<double>(0,2)/2;
+    _perspectiveCy=_intrinsic_parameters.at<double>(1,2)/2;
     _numParticlesReceived=0;
     _staticImageTest = false;
 
@@ -418,7 +418,6 @@ void PF3DTracker::processImage(cv::Mat & image)
     int count;
     unsigned int seed;
     double likelihood, mean, maxX, maxY, maxZ;
-    double weightedMeanX, weightedMeanY, weightedMeanZ;
     double meanU;
     double meanV;
     double wholeCycle;
@@ -469,7 +468,7 @@ void PF3DTracker::processImage(cv::Mat & image)
     //calculate the likelihood of each particle
     //*****************************************
     double sumLikelihood=0.0;
-    double maxLikelihood=0.0;
+    maxLikelihood=0.0;
     int   maxIndex=-1;
     for(count=0;count< _nParticles;count++)
     {
@@ -1111,6 +1110,7 @@ bool PF3DTracker::systematic_resampling(cv::Mat & oldParticlesState, cv::Mat & o
     int npIndex; //%new particle index, tells me how many particles have been created so far.
     int numParticlesToGenerate = _nParticles - _numParticlesReceived; //martim
 
+    //std::cout << "N_PARTICLESTOGenerate: " << numParticlesToGenerate << std::endl;
     //%N is the number of particles.
     //[lines, N] = size(oldParticlesWeight);
     //in CPP, _nParticles is the number of particles.

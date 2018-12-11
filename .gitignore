@@ -18,3 +18,5 @@
 # Svn files
 *.svn
 
+# VS code files
+*.vscode

@@ -53,6 +53,10 @@ catkin_package(
    CATKIN_DEPENDS message_runtime
 )
 
+SET(CMAKE_CXX_FLAGS_RELEASE "-Wall -O3 -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}") #Default build mode is release mode
+
+
 add_executable(pf3d_tracker_node src/Pf3dTrackerRos.cpp)
 
 target_link_libraries(pf3d_tracker_node pf3d_tracker_lib ${catkin_LIBRARIES})
