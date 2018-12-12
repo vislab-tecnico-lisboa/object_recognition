@@ -62,6 +62,7 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
     trackedObjectShapeTemplateFile=models_folder+trackedObjectShapeTemplate;
     motionModelMatrixFile=models_folder+motionModelMatrix;
 
+    ROS_INFO_STREAM("crop_center: "<<crop_center);
     ROS_INFO_STREAM("nParticles: "<<nParticles);
     ROS_INFO_STREAM("accelStdDev: "<<accelStdDev);
     ROS_INFO_STREAM("insideOutsideDifferenceWeight: "<<insideOutsideDifferenceWeight);
@@ -84,15 +85,8 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
     cam_intrinsic.at<double>(0,2) = camera_info->K.at(2);
     cam_intrinsic.at<double>(1,2) = camera_info->K.at(5);
 
-    //cam_intrinsic.at<double>(0,0)=160.0;
-    //cam_intrinsic.at<double>(1,1)=120.0;
-    //cam_intrinsic.at<double>(0,2)=160.0;
-    //cam_intrinsic.at<double>(1,2)=120.0;
     double width=(unsigned int)camera_info->width;
     double height=(unsigned int)camera_info->height;
-    //image_ratio=4;
-    //width/=image_ratio;
-    //height/=image_ratio;
     std::cout << cam_intrinsic << std::endl;
     std::cout << width << std::endl;
     std::cout << height << std::endl;
@@ -133,18 +127,18 @@ void Pf3dTrackerRos::cameraInfoCallback(const sensor_msgs::CameraInfoPtr & camer
 
 void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_ptr)
 {
-    int count;
-    unsigned int seed;
-    double likelihood, mean, maxX, maxY, maxZ;
-    double weightedMeanX, weightedMeanY, weightedMeanZ;
-    double meanU;
-    double meanV;
-    double wholeCycle;
+    //int count;
+    //unsigned int seed;
+    //double likelihood, mean, maxX, maxY, maxZ;
+    //double weightedMeanX, weightedMeanY, weightedMeanZ;
+    //double meanU;
+    //double meanV;
+    //double wholeCycle;
     stringstream out;
     cv::Mat rawImageBGR;
     cv::Mat _rawImage;
 
-    seed=rand();
+    //seed=rand();
     bool _staticImageTest=false;
     if(_staticImageTest)
     {
@@ -184,21 +178,17 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
 
 
 
-    cv::Mat resized_image;
-    //cv::resize(_rawImage, resized_image, cv::Size(3088/2, 2076/2), 0, 0, cv::INTER_CUBIC); // resize to 1024x768 resolution
-
-    
     if(crop_center)
     {
 
-        cv::Mat processed_img = cv::Mat::zeros(resized_image.size(),  resized_image.type());
-        std::cout << resized_image.size() << std::endl;
-        cv::Mat mask = cv::Mat::zeros(resized_image.size(), resized_image.type());
+        cv::Mat processed_img = cv::Mat::zeros(_rawImage.size(),  _rawImage.type());
+        std::cout << _rawImage.size() << std::endl;
+        cv::Mat mask = cv::Mat::zeros(_rawImage.size(), _rawImage.type());
 
         //cv::circle(mask, cv::Point(mask.cols/2, mask.rows/2), 300/2, cv::Scalar(255, 255, 255), -1, 8, 0);
-        cv::rectangle(mask,cv::Point(mask.cols/2-300/2, mask.rows/2-300/2),cv::Point(mask.cols/2+300/2, mask.rows/2+300/2),cv::Scalar(255, 255, 255),-1,8,0);
-        resized_image.copyTo(processed_img, mask);
-        resized_image = processed_img;
+        cv::rectangle(mask,cv::Point(mask.cols/2-300, mask.rows/2-300),cv::Point(mask.cols/2+300, mask.rows/2+300),cv::Scalar(255, 255, 255),-1,8,0);
+        _rawImage.copyTo(processed_img, mask);
+        _rawImage = processed_img;
     }
 
     tracker->processImage(_rawImage);
@@ -226,7 +216,7 @@ void Pf3dTrackerRos::processImageCallback(const sensor_msgs::ImageConstPtr& msg_
     outMsg.pose.orientation.y = 0.0;
     outMsg.pose.orientation.z = 0.0;
     outMsg.pose.orientation.w = 1.0;
-    outMsg.header.frame_id="l_camera_vision_link";
+    outMsg.header.frame_id=msg_ptr->header.frame_id;
     estimates_out.publish(outMsg);
 
 

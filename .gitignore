@@ -20,3 +20,5 @@
 
 # VS code files
 *.vscode
+
+CATKIN_IGNORE

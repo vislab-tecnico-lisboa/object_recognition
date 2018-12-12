@@ -39,6 +39,7 @@ class Pf3dTrackerRos
     //std::string _outputAttentionPortName;
     //ros::Publisher _outputAttentionPort;
     std::string _outputUVDataPortName;
+    std::string _camera_frame_id;
     double image_ratio;
 
     boost::shared_ptr<PF3DTracker> tracker;
