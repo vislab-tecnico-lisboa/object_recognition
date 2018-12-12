@@ -20,5 +20,5 @@ points = np.hstack((p1, p2))
 file = open("initial_ball_points_smiley_57mm_20percent.csv", "w+")
 
 for a in range(0, 3):
-    for b in range(0, nPoints*2):
-        file.write(str(points[a,b])+"\n")
+    for b in range(0, nPoints*2+1):
+        file.write(str(points(a,b)+"\n")
