@@ -188,19 +188,14 @@ bool RosObjectDetails::refinePointCloudServiceCallback(perception_msgs::GetRefin
 {
     ROS_INFO("Refine point cloud service...");
 
-    std::cout << "size in: " << req.point_cloud.points.size() << std::endl;
     sensor_msgs::PointCloud ros_point_cloud;
     sensor_msgs::PointCloud2 ros_point_cloud2;
 
     table_parent_frame_id=req.table.pose.header.frame_id;
-    ROS_INFO_STREAM("PARENT FRAME: " << req.table.pose.header.frame_id);
     tf::poseMsgToTF(req.table.pose.pose, table_transform);
 
     table_detected=true;
     broadcastTable();
-
-
-
 
     ////////////////////////////////////
     // Convert cluster to table frame //
@@ -220,7 +215,7 @@ bool RosObjectDetails::refinePointCloudServiceCallback(perception_msgs::GetRefin
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr pcl_point_cloud_camera(new pcl::PointCloud<pcl::PointXYZINormal>);
 
-    pcl::copyPointCloud(*pcl_point_cloud_temp, *pcl_point_cloud); // THIS IS IMPORTANT (KINECT DOESN'T HAVE INTENSITY FIELD)s
+    pcl::copyPointCloud(*pcl_point_cloud_temp, *pcl_point_cloud); // THIS IS IMPORTANT (KINECT DOESN'T HAVE INTENSITY FIELD'S)
 
     // Convert firstm to camera frame to get normals
     tf::TransformListener listener;
@@ -228,7 +223,6 @@ bool RosObjectDetails::refinePointCloudServiceCallback(perception_msgs::GetRefin
 
     try
     {
-        ROS_INFO_STREAM("FRAME_ID:" << req.point_cloud.header.frame_id);
         listener.waitForTransform(req.point_cloud.header.frame_id, camera_frame_id, ros::Time(0), ros::Duration(5.0));
         listener.lookupTransform(req.point_cloud.header.frame_id, camera_frame_id, ros::Time(0),  camera_transform);
     }
@@ -237,17 +231,14 @@ bool RosObjectDetails::refinePointCloudServiceCallback(perception_msgs::GetRefin
         ROS_ERROR("%s",ex.what());
     }
 
-    /// Converts a tf Transform into an Eigen Affine3d
+    // Converts a tf Transform into an Eigen Affine3d
     // Transform to camera frame
     Eigen::Affine3d eigen_camera_transform;
     tf::transformTFToEigen(camera_transform, eigen_camera_transform);
     pcl::transformPointCloud(*pcl_point_cloud, *pcl_point_cloud_camera, (Eigen::Affine3f) eigen_camera_transform);
 
-
     // Compute normals
     pcl_point_cloud=computeNormals(pcl_point_cloud_camera);
-
-
     pcl::transformPointCloudWithNormals(*pcl_point_cloud, *pcl_point_cloud_camera, (Eigen::Affine3f) eigen_camera_transform.inverse());
 
     // PCL point cloud in table frame
@@ -288,9 +279,9 @@ bool RosObjectDetails::refinePointCloudServiceCallback(perception_msgs::GetRefin
     rviz_point_cloud+=*pcl_point_cloud_transformed;
     cloud_pub.publish(rviz_point_cloud);
 
-    ////////////////////////////////////////////////////
-    // Convert MEGA refined cluster to original frame //
-    ////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////
+    // Convert refined (after reflection) cluster to original frame //
+    //////////////////////////////////////////////////////////////////
 
     pcl::PointCloud<pcl::PointXYZINormal>::Ptr pcl_point_cloud_xyz_reflection(new pcl::PointCloud<pcl::PointXYZINormal>);
     pcl_point_cloud_xyz_reflection=object->point_cloud_complete_xyz_reflect;

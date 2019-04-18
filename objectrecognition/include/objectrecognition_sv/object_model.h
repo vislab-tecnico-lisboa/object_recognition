@@ -36,7 +36,7 @@ public:
             Eigen::Vector3f cross=modelNormal.cross (Eigen::Vector3f::UnitX ()).normalized ();
             Eigen::AngleAxisf rotationPointToGlobal(acosf (modelNormal.dot (Eigen::Vector3f::UnitX ())), cross);
             ++i;
-            if (isnan(cross[0]))
+            if (std::isnan(cross[0]))
             {
                 std::cout << "i: "<<  i << std::endl;
                 rotationPointToGlobal=Eigen::AngleAxisf(0.0,Eigen::Vector3f::UnitX ());

@@ -36,16 +36,10 @@ catkin_package(CATKIN_DEPENDS
 )
 
 catkin_package(
-#  INCLUDE_DIRS include
   LIBRARIES object_details
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
 )
 
 #include_directories(/usr/include/vtk-5.6)
 add_library(object_details src/object_details/object_details.cpp)
 add_executable(ros_object_details src/ros_object_details/ros_object_details.cpp)
-target_link_libraries(ros_object_details object_details libvtkCommon.so libvtkFiltering.so libvtkRendering.so  ${Eigen_LIBRARIES} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${catkin_LIBRARIES}   ${OpenCV_LIBRARIES})
-
-
-
+target_link_libraries(ros_object_details object_details ${vtk_LIBRARIES} ${Eigen_LIBRARIES} ${PCL_LIBRARIES} ${Boost_LIBRARIES} ${catkin_LIBRARIES}   ${OpenCV_LIBRARIES})

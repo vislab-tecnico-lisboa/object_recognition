@@ -244,7 +244,7 @@ transformation objectModelSV::modelToScene(const pcl::PointNormal & pointModel, 
 	Eigen::Vector3f cross=modelNormal.cross (Eigen::Vector3f::UnitX ()).normalized ();
 	Eigen::AngleAxisf rotationModelToGlobal(acosf (modelNormal.dot (Eigen::Vector3f::UnitX ())), cross);
 
-	if (isnan(cross[0]))
+	if (std::isnan(cross[0]))
 	{
 		rotationModelToGlobal=Eigen::AngleAxisf(0.0,Eigen::Vector3f::UnitX ());
 	}		
@@ -386,7 +386,7 @@ void objectModelSV::train()
 
 	for (unsigned int i = 0; i < modelCloud->points.size(); ++i) 
 	{
-		if (isnan(modelCloud->points[i].normal[0]) || isnan(modelCloud->points[i].normal[1]) || isnan(modelCloud->points[i].normal[2]))
+		if (std::isnan(modelCloud->points[i].normal[0]) || std::isnan(modelCloud->points[i].normal[1]) || std::isnan(modelCloud->points[i].normal[2]))
 		{
 	   		normals_nan_indices.indices.push_back(i);
 		}
@@ -509,7 +509,7 @@ void objectModelSV::train()
 			{
 				cross=newNormal.cross (Eigen::Vector3f::UnitX ()). normalized();
 
-				if (isnan(cross[0]))
+				if (std::isnan(cross[0]))
 				{
 					std::cout << "YA"<< std::endl;
 					exit(-1);
@@ -852,7 +852,7 @@ void objectModelSV::train()
 			{
 				cross=newNormal.cross (Eigen::Vector3f::UnitX ()). normalized();
 
-				if (isnan(cross[0]))
+				if (std::isnan(cross[0]))
 				{
 					std::cout << "YA"<< std::endl;
 					exit(-1);

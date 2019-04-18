@@ -297,7 +297,7 @@ Tic();
 
 	for (unsigned int i = 0; i < cloudNormals->points.size(); ++i) 
 	{
-		if (isnan(cloudNormals->points[i].normal[0]) || isnan(cloudNormals->points[i].normal[1]) || isnan(cloudNormals->points[i].normal[2]))
+		if (std::isnan(cloudNormals->points[i].normal[0]) || std::isnan(cloudNormals->points[i].normal[1]) || std::isnan(cloudNormals->points[i].normal[2]))
 		{
 	   		normals_nan_indices.indices.push_back(i);
 		}
@@ -341,7 +341,7 @@ Tic();
 		Eigen::Vector3f cross=sceneNormal.cross (Eigen::Vector3f::UnitX ()). normalized();
 
 		Eigen::Affine3f rotationSceneToGlobal;
-		if(isnan(cross[0]))
+		if(std::isnan(cross[0]))
 		{
 			rotationSceneToGlobal=Eigen::AngleAxisf(0.0,Eigen::Vector3f::UnitX ());
 		}
@@ -548,7 +548,7 @@ Tic();
 
 	for (unsigned int i = 0; i < cloudNormals->points.size(); ++i) 
 	{
-		if (isnan(cloudNormals->points[i].normal[0]) || isnan(cloudNormals->points[i].normal[1]) || isnan(cloudNormals->points[i].normal[2]))
+		if (std::isnan(cloudNormals->points[i].normal[0]) || std::isnan(cloudNormals->points[i].normal[1]) || std::isnan(cloudNormals->points[i].normal[2]))
 		{
 	   		normals_nan_indices.indices.push_back(i);
 		}
@@ -601,7 +601,7 @@ Tic();
 		Eigen::Vector3f cross=sceneNormal.cross (Eigen::Vector3f::UnitX ()). normalized();
 
 		Eigen::Affine3f rotationSceneToGlobal;
-		if(isnan(cross[0]))
+		if(std::isnan(cross[0]))
 		{
 			rotationSceneToGlobal=Eigen::AngleAxisf(0.0,Eigen::Vector3f::UnitX ());
 		}
@@ -826,7 +826,7 @@ std::vector<cluster> poseEstimationSV::poseEstimationCore(pcl::PointCloud<pcl::P
 
 	for (unsigned int i = 0; i < cloudNormals->points.size(); ++i) 
 	{
-		if (isnan(cloudNormals->points[i].normal[0]) || isnan(cloudNormals->points[i].normal[1]) || isnan(cloudNormals->points[i].normal[2]))
+		if (std::isnan(cloudNormals->points[i].normal[0]) || std::isnan(cloudNormals->points[i].normal[1]) || std::isnan(cloudNormals->points[i].normal[2]))
 		{
 	   		normals_nan_indices.indices.push_back(i);
 		}
@@ -914,7 +914,7 @@ std::vector<cluster> poseEstimationSV::poseEstimationCore(pcl::PointCloud<pcl::P
 		{
 			cross=sceneNormal.cross (Eigen::Vector3f::UnitX ()). normalized();
 
-			if (isnan(cross[0]))
+			if (std::isnan(cross[0]))
 			{
 				std::cout << "YA"<< std::endl;
 				exit(-1);
@@ -1241,7 +1241,7 @@ void poseEstimationSV::clusterClusters(std::vector<cluster> & clusters)
 			{
 					if( ( orientationDistance(*c1,*c2) >= pointPair::angleStepCos ) && ( positionDistance(*c1, *c2)) <= (model->maxModelDistSquared*0.05*0.05 ) )
 					{
-						if(isnan(acos(orientationDistance(*c1, *c2))))
+						if(std::isnan(acos(orientationDistance(*c1, *c2))))
 						{
 							std::cout << c1->meanPose.transform.rotation.w() << " " << c1->meanPose.transform.rotation.x() << " " << c1->meanPose.transform.rotation.y() << " " << c1->meanPose.transform.rotation.z() << std::endl;
 							std::cout << c2->meanPose.transform.rotation.w() << " " << c2->meanPose.transform.rotation.x() << " " << c2->meanPose.transform.rotation.y() << " " << c2->meanPose.transform.rotation.z() << std::endl;

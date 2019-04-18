@@ -408,7 +408,6 @@ void ObjectDetails::completeConsideringRotationalSymmetry(const double & x_sym, 
 		viewer2->spinOnce (100);
  		boost::this_thread::sleep (boost::posix_time::microseconds (100000));
  	}*/
-
 }
 
 
@@ -569,8 +568,6 @@ void ObjectDetails::completeObjectPointCloudAlternative(PointCloudInPtr point_cl
 	x_2D_centroid=cluster_average_position[0];
 	y_2D_centroid=cluster_average_position[1];
 
-	std::cout << "CLUSTER AVERAGE POSITION:" << cluster_average_position << std::endl;
-
 	///////////////////////
 	// Get highest point //
 	///////////////////////
@@ -585,11 +582,8 @@ void ObjectDetails::completeObjectPointCloudAlternative(PointCloudInPtr point_cl
 		}
 	}
 
-
 	double x_density_2D_centroid=0.0;
 	double y_density_2D_centroid=0.0;
-
-
 
 	for(PointCloudIn::iterator p=core2D->begin(); p<core2D->end(); ++p)
 	{
@@ -621,12 +615,9 @@ void ObjectDetails::completeObjectPointCloudAlternative(PointCloudInPtr point_cl
 	// Downsample top part projected on the XY plane, using a grid filter
 	cluster_top2D=downsamplePointCloud(cluster_top2D, downsampling_step);
 
-
-
 	///////////////////////////////////
 	// Find handle (devide in parts) //
 	///////////////////////////////////
-
 
 	if(findHandle(point_cloud,core2D,centroid_distance))
 	{
@@ -655,17 +646,12 @@ void ObjectDetails::completeObjectPointCloudAlternative(PointCloudInPtr point_cl
 
 	(*complete_point_cloud)+=(*core_point_cloud);
 
-
  	/* boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer2 = viewportsVis(point_cloud_complete_xyz_reflect);
 	while (!viewer2->wasStopped ())
  	{
 		viewer2->spinOnce (100);
  		boost::this_thread::sleep (boost::posix_time::microseconds (100000));
  	}*/
-
-
-
- 
 
 	////////////////////////////////////////
 	// Compute PCA for the top projection //
@@ -814,20 +800,19 @@ void ObjectDetails::computeBodyBoundingBox(PointCloudInPtr _point_cloud, Eigen::
 	/////////////////
 
 	// Project on the XY plane
-
 	ObjectDetails::PointCloudInPtr xy_point_cloud=planeProjection(_point_cloud);
 
 	// Downsample using a grid filter
 	xy_point_cloud=downsamplePointCloud(xy_point_cloud, downsampling_step);
 
+	// Convert projected cloud from pcl to eigen
 	for(unsigned int i=0; i<xy_point_cloud->points.size(); ++i)
 	{
 		va.add(Eigen::Matrix<float, 3, 1> (xy_point_cloud->points[i].x, xy_point_cloud->points[i].y, xy_point_cloud->points[i].z));
 	}
 
+    // Eigen Value Decomposition
 	va.doPCA(_eigen_values, _eigen_vector[0], _eigen_vector[1], _eigen_vector[2]);
-
-std::cout << "EIGEN VALUUUUUES: " << _eigen_values<< std::endl;
 
 	///////////////////////
 	// Get highest point //
@@ -852,29 +837,25 @@ std::cout << "EIGEN VALUUUUUES: " << _eigen_values<< std::endl;
 		double aux_value=_eigen_values[1];
 		_eigen_values[1]=temp_eigen_value;
 		_eigen_values[0]=aux_value;
-		std::cout << "ola" << std::endl;
 	}
 	else if(temp_eigen_value>_eigen_values[2])
 	{
-			_eigen_vector[0]=_eigen_vector[1];
-			_eigen_values[0]=_eigen_values[1];
-			_eigen_vector[1]=_eigen_vector[2];
-			_eigen_values[1]=_eigen_values[2];
-			_eigen_vector[2]=Eigen::Vector3f::UnitZ();
-			_eigen_values[2]=temp_eigen_value;
-		std::cout << "ole" << std::endl;
+		_eigen_vector[0]=_eigen_vector[1];
+		_eigen_values[0]=_eigen_values[1];
+		_eigen_vector[1]=_eigen_vector[2];
+		_eigen_values[1]=_eigen_values[2];
+		_eigen_vector[2]=Eigen::Vector3f::UnitZ();
+		_eigen_values[2]=temp_eigen_value;
 	}
 	else
 	{
-			_eigen_vector[0]=Eigen::Vector3f::UnitZ();
-			_eigen_values[0]=temp_eigen_value;
-		std::cout << "oli" << std::endl;
+		_eigen_vector[0]=Eigen::Vector3f::UnitZ();
+		_eigen_values[0]=temp_eigen_value;
 	}
 
-
-	_position = va.getMean();
-
-	_position[2]=temp_eigen_value;
+	// Get point cloud position
+	_position = va.getMean(); // XY center
+	_position[2]=temp_eigen_value; // Z center
 
 	va.reset();
 
@@ -906,7 +887,6 @@ std::cout << "EIGEN VALUUUUUES: " << _eigen_values<< std::endl;
 	position_temp[0]=( max_pt.x() + min_pt.x() )/2.00000;
 	position_temp[1]=( max_pt.y() + min_pt.y() )/2.00000;
 	position_temp[2]=( max_pt.z() + min_pt.z() )/2.00000;
-	//std::cout << "position temp before:" << position_temp << std::endl;
 	_position=_position+( _pose.rotation() * position_temp );
 	_pose=Eigen::Translation3f(_position)*angleAxis;
 	centered_point_cloud->clear();
@@ -917,11 +897,7 @@ std::cout << "EIGEN VALUUUUUES: " << _eigen_values<< std::endl;
 	//////////////////////////
 
 	pcl::getMinMax3D(*centered_point_cloud, min_pt, max_pt);
-	/*position_temp[0]=( max_pt.x() + min_pt.x() )/2.00000;
-	position_temp[1]=( max_pt.y() + min_pt.y() )/2.00000;
-	position_temp[2]=( max_pt.z() + min_pt.z() )/2.00000;*/
 
-	//std::cout << "position temp after:" << position_temp << std::endl;
 	_bounding_box[X_o]=( max_pt.x() - min_pt.x() )/2.00000;
 	_bounding_box[Y_o]=( max_pt.y() - min_pt.y() )/2.00000;
 	_bounding_box[Z_o]=( max_pt.z() - min_pt.z() )/2.00000;
@@ -944,7 +920,6 @@ std::cout << "EIGEN VALUUUUUES: " << _eigen_values<< std::endl;
 
 void ObjectDetails::applyBoundingBoxOrientationRules()
 {
-	// PIOR CODIGO DE SEMPRE -> MELHORAR ISTO
 	double biggest_component=0.0;
 	int biggest_component_index=0;
 	for(int i=0; i<3 ;++i)
@@ -985,8 +960,6 @@ void ObjectDetails::applyBoundingBoxOrientationRules()
 	eigen_vector[2]=aux_eigen_vector[biggest_component_index];
 	eigen_vector[1]=aux_eigen_vector[second_biggest_component_index];
 	eigen_vector[0]=aux_eigen_vector[third_biggest_component_index];
-
-	//std::cout << "eigen_values:" << eigen_values << std::endl;
 }
 
 void ObjectDetails::getBodyHandleIndices(PointCloudInPtr point_cloud)
@@ -1047,7 +1020,6 @@ void ObjectDetails::getBodyHandleIndices(PointCloudInPtr point_cloud)
 
 void ObjectDetails::computeObjectDetails(PointCloudInPtr point_cloud_object_details, PointCloudInPtr point_cloud)
 {
-
 	getBodyHandleIndices(point_cloud_object_details);
 
 	Eigen::Vector4f min_pt,max_pt;
@@ -1056,7 +1028,6 @@ void ObjectDetails::computeObjectDetails(PointCloudInPtr point_cloud_object_deta
 	computeObjectShapeType();
 	computeDiscreteOrientation(); // See if object is in vertical or horizontal orientation (depends on shape)
 	computeObjectPose(); // Compute axis direction
-
 
 	computeObjectPartsNumber();
 	computeObjectSymmetryType();

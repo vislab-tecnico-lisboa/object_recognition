@@ -1344,7 +1344,7 @@ private:
 #endif
             delaunay->SetProjectionPlaneMode(2);
             delaunay->Update();
-            append->AddInput(delaunay->GetOutput());
+            append->AddInputData(delaunay->GetOutput());
             append->Update();
 
             // Visualize
